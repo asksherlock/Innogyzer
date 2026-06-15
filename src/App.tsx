@@ -4,6 +4,9 @@ import { motion, useScroll, useTransform, AnimatePresence, useMotionValue, useMo
 import { ArrowRightIcon, UserGroupIcon, ChartBarIcon, ChatBubbleBottomCenterTextIcon, CheckCircleIcon, CpuChipIcon, BeakerIcon } from '@heroicons/react/24/outline';
 import { SiPython, SiNotion, SiOpenai, SiZapier, SiAirtable, SiMake, SiGooglegemini, SiAnthropic, SiHuggingface, SiTensorflow } from 'react-icons/si';
 import { SvgRings, SvgArrows, SvgFaceCursor, SvgAsterisk, SvgVenn, SvgFlower, SvgStarburst } from './Decorations';
+import PrivacyPolicy from './PrivacyPolicy';
+import Blog from './Blog';
+import BlogPost from './BlogPost';
 import Lenis from 'lenis';
 
 // --- Smooth Scroll Init ---
@@ -373,14 +376,16 @@ const Navbar = () => {
       </Magnetic>
       
       <div className="hidden lg:flex gap-8 text-sm font-medium text-white/70">
-        <Magnetic><Link to={isHome ? "#" : "/"} className="hover:text-white transition-colors">Home</Link></Magnetic>
-        <Magnetic><Link to={isHome ? "#servicios" : "/#servicios"} className="hover:text-white transition-colors">Curso</Link></Magnetic>
-        <Magnetic><Link to={isHome ? "#" : "/"} className="hover:text-white transition-colors">Log In | Clientes</Link></Magnetic>
+        <Magnetic><Link to={isHome ? "#quienes-somos" : "/#quienes-somos"} className="hover:text-white transition-colors">¿Quiénes somos?</Link></Magnetic>
+        <Magnetic><Link to={isHome ? "#servicios" : "/#servicios"} className="hover:text-white transition-colors">Servicios Innovación</Link></Magnetic>
+        <Magnetic><Link to={isHome ? "#servicios-ia" : "/#servicios-ia"} className="hover:text-white transition-colors">Servicios IA</Link></Magnetic>
+        <Magnetic><Link to="/aviso-privacidad" className="hover:text-white transition-colors">Aviso de Privacidad</Link></Magnetic>
+        <Magnetic><Link to="/blog" className="hover:text-white transition-colors">Blog</Link></Magnetic>
       </div>
 
       <Magnetic>
         <button onClick={() => window.dispatchEvent(new CustomEvent('openContactModal'))} className="bg-[#dcea22] hover:bg-[#eab308] text-black px-5 py-2.5 rounded-lg font-bold text-sm transition-colors shadow-lg shadow-yellow-900/30">
-          Agenda una llamada
+          Agenda
         </button>
       </Magnetic>
     </motion.nav>
@@ -465,7 +470,7 @@ const fadeUp = {
 
 const Manifesto = () => {
   return (
-    <section className="py-40 relative z-10 overflow-hidden bg-black/40 border-y border-white/5">
+    <section className="py-40 relative z-10 overflow-hidden bg-black/40">
       <div className="absolute inset-0 bg-gradient-to-b from-transparent via-cyan-900/10 to-transparent pointer-events-none" />
       <div className="container mx-auto px-6 max-w-5xl text-left relative z-10">
         <ScrollRevealText 
@@ -524,7 +529,7 @@ const About = () => {
   ];
 
   return (
-    <section id="quienes-somos" className="py-24 relative z-10">
+    <section id="quienes-somos" className="py-24 relative z-10 bg-black/40">
       <div className="container mx-auto px-6 max-w-7xl">
         <WordReveal text="¿Quiénes somos?" className="text-4xl md:text-6xl font-bold mb-20 justify-center" />
         
@@ -566,7 +571,7 @@ const Pillars = () => {
   ];
 
   return (
-    <section id="pilares" className="py-24 relative z-10">
+    <section id="pilares" className="py-24 relative z-10 bg-black/40">
       <div className="container mx-auto px-6 max-w-7xl">
         <WordReveal text="Nuestros Pilares Fundamentales" className="text-4xl md:text-6xl font-bold mb-20 text-center text-gradient-animate" />
         
@@ -605,7 +610,7 @@ const Services = () => {
   ];
 
   return (
-    <section id="servicios" className="py-32 relative z-10 border-y border-white/5">
+    <section id="servicios" className="py-32 relative z-10 bg-black/40">
       <div className="container mx-auto px-6 max-w-7xl">
         <WordReveal text="Servicios de Innovación" className="text-4xl md:text-6xl font-bold mb-20" />
         
@@ -693,7 +698,7 @@ const Services = () => {
 
 const ServicesAI = () => {
   return (
-    <section id="servicios-ia" className="py-32 relative z-10 overflow-hidden">
+    <section id="servicios-ia" className="py-32 relative z-10 overflow-hidden bg-black/40">
       <div className="absolute top-1/2 right-0 w-[800px] h-[800px] bg-glow/10 blur-[150px] rounded-full pointer-events-none" />
       
       <div className="container mx-auto px-6 max-w-7xl">
@@ -767,7 +772,7 @@ const Team = () => {
   ];
 
   return (
-    <section id="equipo" className="py-32 relative z-10 border-t border-white/5">
+    <section id="equipo" className="py-32 relative z-10 bg-black/40">
       <div className="container mx-auto px-6 max-w-7xl">
         <motion.div variants={fadeUp} initial="hidden" whileInView="visible" viewport={{ once: true }} className="text-center mb-20 max-w-3xl mx-auto">
           <WordReveal text="Equipo" className="text-4xl md:text-6xl font-bold mb-8 justify-center" />
@@ -896,7 +901,7 @@ const ClientsMarquee = () => {
   ];
 
   return (
-    <section className="py-16 border-y border-white/5 bg-[#050505] relative z-20 flex flex-col items-center overflow-hidden">
+    <section className="py-16 bg-[#050505] relative z-20 flex flex-col items-center overflow-hidden">
       <p className="text-white/40 text-xs md:text-sm font-medium tracking-[0.2em] uppercase mb-12 text-center px-4">
         Organizaciones que confían en nosotros
       </p>
@@ -1037,6 +1042,10 @@ const Home = () => {
       </main>
       <div className="relative z-20">
         <FluidBlueBackground />
+        
+        {/* Soft transition gradient to blend Hero into the colorful background */}
+        <div className="absolute top-0 inset-x-0 h-[800px] bg-gradient-to-b from-black via-black/90 to-transparent pointer-events-none z-[1]" />
+        
         <Manifesto />
         <About />
         <Pillars />
@@ -1131,6 +1140,9 @@ function App() {
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/servicios/:id" element={<ServicePage />} />
+            <Route path="/aviso-privacidad" element={<PrivacyPolicy />} />
+            <Route path="/blog" element={<Blog />} />
+            <Route path="/blog/:slug" element={<BlogPost />} />
           </Routes>
         </div>
         
