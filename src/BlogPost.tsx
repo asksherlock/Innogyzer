@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from 'react';
-import { motion } from 'framer-motion';
+import { useEffect, useState } from 'react';
+
 import { useParams, Link } from 'react-router-dom';
 import { getPostBySlug } from './services/payload';
 import type { Post } from './services/payload';
