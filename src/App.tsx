@@ -754,6 +754,21 @@ const ServicesAI = () => {
                 </Link>
               </Magnetic>
             </motion.div>
+
+            <motion.div 
+              variants={fadeUp} initial="hidden" whileInView="visible" whileHover={{ scale: 1.05, x: -10 }} viewport={{ once: true }} 
+              className="glass-panel p-10 rounded-[40px] group hover:border-primary/50 transition-colors shadow-2xl relative overflow-hidden"
+            >
+              <div className="absolute top-0 right-0 w-64 h-64 bg-primary/10 blur-[80px] rounded-full pointer-events-none" />
+              <h3 className="text-3xl font-bold mb-2 relative z-10">Capacitación de IA</h3>
+              <h4 className="text-primary font-medium mb-6 text-xl relative z-10">AI Training</h4>
+              <p className="text-white/60 mb-8 text-lg relative z-10">Potencia las habilidades de tu equipo. Ofrecemos programas de capacitación y talleres prácticos para dominar las herramientas de Inteligencia Artificial.</p>
+              <Magnetic>
+                <Link to="/servicios/ai-training" className="flex items-center gap-3 text-white font-bold group-hover:text-primary transition-colors relative z-10 text-lg">
+                  Ver detalles <ArrowRightIcon className="w-5 h-5" />
+                </Link>
+              </Magnetic>
+            </motion.div>
           </div>
         </div>
       </div>
@@ -763,12 +778,11 @@ const ServicesAI = () => {
 
 const Team = () => {
   const members = [
-    { name: 'Marco Velasco', role: 'Chief Executive Officer' },
-    { name: 'Claudia Mendoza', role: 'Chief Operations and Project' },
-    { name: 'Iván Sánchez', role: 'Head of Artificial Intelligence Solutions' },
-    { name: 'Mariana Díaz', role: 'Head of Innovation Design' },
-    { name: 'Ricardo Gonzalez De La Cruz', role: 'CEO' },
-    { name: 'Juan Jose Cordova Zamorano', role: 'CTO - Chief Technology Officer' },
+    { name: 'Marco Velasco', role: 'Chief Executive Officer', image: '/team/marcovelazco.jpeg', linkedin: 'https://www.linkedin.com/in/marco-velasco-toledo/' },
+    { name: 'Claudia Mendoza', role: 'Chief Operations and Project', image: '/team/claudiamendoza.jpg' },
+    { name: 'Iván Sánchez', role: 'Head of Artificial Intelligence Solutions', image: '/team/ivansanchez.jpeg', linkedin: 'https://www.linkedin.com/in/ivsanchezm/' },
+    { name: 'Mariana Díaz', role: 'Head of Innovation Design', image: '/team/marianalopez.jpg' },
+    { name: 'Juan Jose Cordova Zamorano', role: 'CTO - Chief Technology Officer', image: '/team/juanjose.jpeg', linkedin: 'https://www.linkedin.com/in/jjcordova/' },
   ];
 
   return (
@@ -780,23 +794,33 @@ const Team = () => {
         </motion.div>
 
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-8">
-          {members.map((member, i) => (
-            <motion.div 
-              key={i}
-              variants={fadeUp}
-              initial="hidden"
-              whileInView="visible"
-              whileHover={{ scale: 1.1, y: -10 }}
-              viewport={{ once: true }}
-              transition={{ delay: i * 0.1, type: "spring", stiffness: 300 }}
-              className="glass-panel p-8 rounded-[30px] text-center group relative overflow-hidden"
-            >
-              <div className="absolute inset-0 bg-gradient-to-b from-white/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
-              <div className="w-32 h-32 mx-auto rounded-full bg-gradient-to-br from-surface to-white/5 mb-8 border border-white/10 group-hover:border-primary group-hover:shadow-[0_0_30px_rgba(220,234,34,0.3)] transition-all duration-500 relative z-10" />
-              <h4 className="text-xl font-bold mb-2 relative z-10 group-hover:text-primary transition-colors">{member.name}</h4>
-              <p className="text-white/50 text-sm relative z-10">{member.role}</p>
-            </motion.div>
-          ))}
+          {members.map((member, i) => {
+            const CardWrapper = member.linkedin ? motion.a : motion.div;
+            return (
+              <CardWrapper 
+                key={i}
+                href={member.linkedin}
+                target={member.linkedin ? "_blank" : undefined}
+                rel={member.linkedin ? "noopener noreferrer" : undefined}
+                variants={fadeUp}
+                initial="hidden"
+                whileInView="visible"
+                whileHover={{ scale: 1.1, y: -10 }}
+                viewport={{ once: true }}
+                transition={{ delay: i * 0.1, type: "spring", stiffness: 300 }}
+                className="glass-panel p-8 rounded-[30px] text-center group relative overflow-hidden block"
+              >
+                <div className="absolute inset-0 bg-gradient-to-b from-white/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
+                <div className="w-32 h-32 mx-auto rounded-full bg-gradient-to-br from-surface to-white/5 mb-8 border border-white/10 group-hover:border-primary group-hover:shadow-[0_0_30px_rgba(220,234,34,0.3)] transition-all duration-500 relative z-10 overflow-hidden">
+                  {member.image ? (
+                    <img src={member.image} alt={member.name} className="w-full h-full object-cover" />
+                  ) : null}
+                </div>
+                <h4 className="text-xl font-bold mb-2 relative z-10 group-hover:text-primary transition-colors">{member.name}</h4>
+                <p className="text-white/50 text-sm relative z-10">{member.role}</p>
+              </CardWrapper>
+            );
+          })}
         </div>
       </div>
     </section>
@@ -1072,6 +1096,7 @@ const ServicePage = () => {
     'experimentacion': { title: 'Experimentación', subtitle: 'Aprende rápido, falla barato', details: 'Validamos tus ideas de negocio de manera ágil y efectiva reduciendo la incertidumbre mediante pilotos y pruebas MVP iterativas.' },
     'ai-consulting': { title: 'Consultoría IA', subtitle: 'Implementa IA en tus procesos', details: '¿Necesitas transformar tus procesos con IA? Nuestro equipo de expertos diseña soluciones a medida que se integran perfectamente con los flujos de trabajo de tu industria.' },
     'business-automation': { title: 'Automatización Empresarial', subtitle: 'El futuro del trabajo', details: 'Dale un respiro a tu equipo. Permite que la IA gestione las tareas repetitivas y minimice los errores, mientras tu empresa se enfoca en estrategias de alto impacto.' },
+    'ai-training': { title: 'Capacitación IA', subtitle: 'Potencia las habilidades de tu equipo', details: 'Ofrecemos programas de capacitación y talleres prácticos para dominar las herramientas de Inteligencia Artificial que transformarán la manera en la que trabajan.' },
   };
 
   const service = serviceData[id as string] || { title: 'Servicio no encontrado', subtitle: '', details: 'Lo sentimos, la información solicitada no está disponible.' };
