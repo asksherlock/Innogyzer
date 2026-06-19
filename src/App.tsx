@@ -96,63 +96,60 @@ const ParticleSphere = () => {
     const draw = () => {
       ctx.clearRect(0, 0, width, height);
       
-      angleY += 0.003; 
-      angleX += 0.001;
+      const deltaAngleY = 0.003; 
+      const deltaAngleX = 0.001;
 
       const centerX = width / 2;
       const centerY = height / 2;
 
       // Physics variables
-      const interactionRadius = 200; // Pixels
-      const pushForce = 0.04; // How much it repels
-      const returnSpeed = 0.06; // Spring back
-      const dampening = 0.85;
+      const interactionRadius = 250; // Área de interacción más grande
+      const pushForce = 0.6; // Fuerza masiva para simular explosión
+      const dampening = 0.96; // Se deslizan más lejos antes de detenerse
 
       particles.forEach((p) => {
-        // 1. Rotate base position
-        let rx = p.baseX;
-        let ry = p.baseY * Math.cos(angleX) - p.baseZ * Math.sin(angleX);
-        let rz = p.baseY * Math.sin(angleX) + p.baseZ * Math.cos(angleX);
+        // 1. Apply Continuous Rotation directly to cx, cy, cz
+        let rx = p.cx;
+        let ry = p.cy * Math.cos(deltaAngleX) - p.cz * Math.sin(deltaAngleX);
+        let rz = p.cy * Math.sin(deltaAngleX) + p.cz * Math.cos(deltaAngleX);
 
-        let finalX = rx * Math.cos(angleY) + rz * Math.sin(angleY);
-        let finalY = ry;
-        let finalZ = -rx * Math.sin(angleY) + rz * Math.cos(angleY);
+        p.cx = rx * Math.cos(deltaAngleY) + rz * Math.sin(deltaAngleY);
+        p.cy = ry;
+        p.cz = -rx * Math.sin(deltaAngleY) + rz * Math.cos(deltaAngleY);
 
-        // Calculate screen projection of base position to check mouse collision
-        const scale = 1000 / (1000 + finalZ * sphereRadius);
-        const screenX = centerX + finalX * sphereRadius * scale;
-        const screenY = centerY + finalY * sphereRadius * scale;
+        // 2. Screen projection for collision
+        const scale = 1000 / (1000 + p.cz * sphereRadius);
+        const screenX = centerX + p.cx * sphereRadius * scale;
+        const screenY = centerY + p.cy * sphereRadius * scale;
 
-        // 2. Mouse Repulsion
+        // 3. Mouse Repulsion (Explosion)
         if (isMouseMoving) {
           const dx = screenX - mouse.x;
           const dy = screenY - mouse.y;
           const dist = Math.sqrt(dx * dx + dy * dy);
           
           if (dist < interactionRadius) {
-            const force = (interactionRadius - dist) / interactionRadius;
-            // Normalizing dx/dy
+            // Curva de fuerza exponencial para que explote violentamente en el centro
+            const force = Math.pow((interactionRadius - dist) / interactionRadius, 2);
             p.vx += (dx / dist) * force * pushForce;
             p.vy += (dy / dist) * force * pushForce;
+            
+            // Explosión aleatoria en el eje Z para que vuelen en 3D
+            p.vz += (Math.random() - 0.5) * force * pushForce * 2;
           }
         }
 
-        // 3. Apply physics
-        p.cx += p.vx;
-        p.cy += p.vy;
-        p.cz += p.vz;
+        // 4. Apply physics (Convert pixel velocity to normalized 3D space)
+        p.cx += p.vx / sphereRadius;
+        p.cy += p.vy / sphereRadius;
+        p.cz += p.vz / sphereRadius;
 
         // Friction
         p.vx *= dampening;
         p.vy *= dampening;
         p.vz *= dampening;
 
-        // Spring back to target
-        p.cx += (finalX - p.cx) * returnSpeed;
-        p.cy += (finalY - p.cy) * returnSpeed;
-        p.cz += (finalZ - p.cz) * returnSpeed;
-
-        // 4. Render
+        // 5. Render
         const finalScale = 1000 / (1000 + p.cz * sphereRadius);
         const finalScreenX = centerX + p.cx * sphereRadius * finalScale;
         const finalScreenY = centerY + p.cy * sphereRadius * finalScale;
@@ -780,9 +777,9 @@ const Team = () => {
   const members = [
     { name: 'Marco Velasco', role: 'Chief Executive Officer', image: '/team/marcovelazco.jpeg', linkedin: 'https://www.linkedin.com/in/marco-velasco-toledo/' },
     { name: 'Claudia Mendoza', role: 'Chief Operations and Project', image: '/team/claudiamendoza.jpg' },
-    { name: 'Iván Sánchez', role: 'Head of Artificial Intelligence Solutions', image: '/team/ivansanchez.jpeg', linkedin: 'https://www.linkedin.com/in/ivsanchezm/' },
+    { name: 'Iván Sánchez', role: 'Head of Artificial Intelligence Solutions', image: '/team/ivansanchez.png', linkedin: 'https://www.linkedin.com/in/ivsanchezm/' },
     { name: 'Mariana Díaz', role: 'Head of Innovation Design', image: '/team/marianalopez.jpg' },
-    { name: 'Juan Jose Cordova Zamorano', role: 'CTO - Chief Technology Officer', image: '/team/juanjose.jpeg', linkedin: 'https://www.linkedin.com/in/jjcordova/' },
+    { name: 'Juan Jose Cordova Zamorano', role: 'CTO - Chief Technology Officer', image: '/team/juanjosa.jpeg', linkedin: 'https://www.linkedin.com/in/jjcordova/' },
   ];
 
   return (
