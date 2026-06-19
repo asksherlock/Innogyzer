@@ -7,6 +7,7 @@ import { SvgRings, SvgArrows, SvgFaceCursor, SvgAsterisk, SvgVenn, SvgFlower, Sv
 import PrivacyPolicy from './PrivacyPolicy';
 import Blog from './Blog';
 import BlogPost from './BlogPost';
+import ImagePresentationViewer from './components/ImagePresentationViewer';
 import Lenis from 'lenis';
 
 // --- Smooth Scroll Init ---
@@ -63,24 +64,16 @@ const ParticleSphere = () => {
       const x = Math.cos(theta) * radiusAtY;
       const z = Math.sin(theta) * radiusAtY;
 
+      // Las partículas inician en el centro (0,0,0) con gran velocidad hacia afuera (x, y, z son la dirección)
+      const speed = Math.random() * 40 + 20; // Velocidad aleatoria de explosión
       particles.push({
         baseX: x, baseY: y, baseZ: z,
-        cx: x, cy: y, cz: z,
-        vx: 0, vy: 0, vz: 0
+        cx: 0, cy: 0, cz: 0,
+        vx: x * speed, 
+        vy: y * speed, 
+        vz: z * speed
       });
     }
-
-    let mouse = { x: -1000, y: -1000 };
-    let isMouseMoving = false;
-
-    const handleMouseMove = (e: MouseEvent) => {
-      mouse.x = e.clientX;
-      mouse.y = e.clientY;
-      isMouseMoving = true;
-    };
-
-    window.addEventListener('mousemove', handleMouseMove);
-    window.addEventListener('mouseout', () => isMouseMoving = false);
 
     const handleResize = () => {
       width = canvas.width = window.innerWidth;
@@ -101,8 +94,6 @@ const ParticleSphere = () => {
       const centerY = height / 2;
 
       // Physics variables
-      const interactionRadius = 250; // Área de interacción más grande
-      const pushForce = 0.6; // Fuerza masiva para simular explosión
       const dampening = 0.96; // Se deslizan más lejos antes de detenerse
 
       particles.forEach((p) => {
@@ -115,29 +106,6 @@ const ParticleSphere = () => {
         p.cy = ry;
         p.cz = -rx * Math.sin(deltaAngleY) + rz * Math.cos(deltaAngleY);
 
-        // 2. Screen projection for collision
-        const scale = 1000 / (1000 + p.cz * sphereRadius);
-        const screenX = centerX + p.cx * sphereRadius * scale;
-        const screenY = centerY + p.cy * sphereRadius * scale;
-
-        // 3. Mouse Repulsion (Explosion)
-        if (isMouseMoving) {
-          const dx = screenX - mouse.x;
-          const dy = screenY - mouse.y;
-          const dist = Math.sqrt(dx * dx + dy * dy);
-          
-          if (dist < interactionRadius) {
-            // Curva de fuerza exponencial para que explote violentamente en el centro
-            const force = Math.pow((interactionRadius - dist) / interactionRadius, 2);
-            p.vx += (dx / dist) * force * pushForce;
-            p.vy += (dy / dist) * force * pushForce;
-            
-            // Explosión aleatoria en el eje Z para que vuelen en 3D
-            p.vz += (Math.random() - 0.5) * force * pushForce * 2;
-          }
-        }
-
-        // 4. Apply physics (Convert pixel velocity to normalized 3D space)
         p.cx += p.vx / sphereRadius;
         p.cy += p.vy / sphereRadius;
         p.cz += p.vz / sphereRadius;
@@ -154,7 +122,19 @@ const ParticleSphere = () => {
 
         // Depth sorting effect (fade out back particles)
         const zIndex = p.cz; 
-        const opacity = Math.max(0.05, (zIndex + 1) / 2);
+        let opacity = Math.max(0.05, (zIndex + 1) / 2);
+
+        // Vertical edge fade to prevent clipping at section divisions
+        const marginY = height * 0.15; // 15% of screen height at top/bottom
+        
+        if (finalScreenY < marginY) {
+          const fadeOut = finalScreenY / marginY;
+          opacity *= Math.max(0, fadeOut);
+        } else if (finalScreenY > height - marginY) {
+          const fadeOut = (height - finalScreenY) / marginY;
+          opacity *= Math.max(0, fadeOut);
+        }
+
         const radius = Math.max(0.5, 3 * opacity * finalScale);
 
         ctx.beginPath();
@@ -170,7 +150,6 @@ const ParticleSphere = () => {
 
     return () => {
       window.removeEventListener('resize', handleResize);
-      window.removeEventListener('mousemove', handleMouseMove);
       cancelAnimationFrame(animationFrameId);
     };
   }, []);
@@ -538,7 +517,7 @@ const About = () => {
               whileHover={{ scale: 1.05, y: -10 }}
               viewport={{ once: true }}
               transition={{ delay: i * 0.1, duration: 0.5, type: "spring" }}
-              className={`p-10 rounded-3xl border ${card.highlight ? 'bg-primary text-black border-primary shadow-[0_0_40px_rgba(220,234,34,0.3)]' : 'glass-panel text-white'} flex flex-col group shadow-2xl relative overflow-hidden h-full`}
+              className={`p-10 rounded-3xl border ${card.highlight ? 'bg-primary text-black border-primary shadow-[0_0_20px_rgba(220,234,34,0.15)]' : 'glass-panel text-white'} flex flex-col group shadow-2xl relative overflow-hidden h-full`}
             >
               <div className="relative z-10 flex flex-col h-full">
                 <span className={`text-sm font-bold mb-8 block ${card.highlight ? 'text-black/50' : 'text-primary'}`}>0{card.num}</span>
@@ -582,7 +561,7 @@ const Pillars = () => {
               transition={{ delay: i * 0.1, duration: 0.4 }}
               className="flex flex-col items-center text-center p-8 transition-colors group"
             >
-              <div className="mb-8 text-white group-hover:text-primary transition-colors duration-500 drop-shadow-[0_0_15px_rgba(255,255,255,0.1)] group-hover:drop-shadow-[0_0_20px_rgba(220,234,34,0.3)]">
+              <div className="mb-8 text-white group-hover:text-primary transition-colors duration-500 drop-shadow-[0_0_10px_rgba(255,255,255,0.05)] group-hover:drop-shadow-[0_0_15px_rgba(220,234,34,0.2)]">
                 {pillar.icon}
               </div>
               <h4 className="font-light text-lg text-white/80 group-hover:text-primary transition-colors">{pillar.title}</h4>
@@ -709,12 +688,8 @@ const ServicesAI = () => {
               transition={{ type: "spring", stiffness: 300 }}
               style={{ perspective: 1000 }}
             >
-              <div className="w-full max-w-md rounded-[40px] shadow-[0_0_80px_rgba(220,234,34,0.3)] border border-primary/20 hidden lg:block overflow-hidden bg-[#1e1e1e]">
-                <iframe 
-                  src="/Learning_by_Innogyzer_2026.pdf" 
-                  title="Learning by Innogyzer" 
-                  className="w-full h-[600px] border-none"
-                />
+              <div className="w-full max-w-md rounded-[40px] glass-panel border border-white/10 hidden lg:block overflow-hidden relative group">
+                <ImagePresentationViewer />
               </div>
             </motion.div>
           </motion.div>
@@ -737,11 +712,10 @@ const ServicesAI = () => {
 
             <motion.div 
               variants={fadeUp} initial="hidden" whileInView="visible" whileHover={{ scale: 1.05, x: -10 }} viewport={{ once: true }} 
-              className="bg-gradient-to-br from-primary to-[#b8c617] text-black p-10 rounded-[40px] group shadow-[0_0_50px_rgba(220,234,34,0.4)] relative overflow-hidden"
+              className="bg-gradient-to-br from-primary to-[#b8c617] p-10 rounded-[40px] group shadow-xl relative overflow-hidden"
             >
-              <div className="absolute top-0 right-0 w-64 h-64 bg-white/20 blur-[60px] rounded-full pointer-events-none" />
-              <h3 className="text-3xl font-bold mb-2 relative z-10">Procesos de Automatización empresarial</h3>
-              <h4 className="text-black/60 font-bold mb-6 text-xl relative z-10">El futuro llegó</h4>
+              <h3 className="text-3xl font-bold mb-2 relative z-10 text-black">Procesos de Automatización empresarial</h3>
+              <h4 className="text-black/70 font-bold mb-6 text-xl relative z-10">El futuro llegó</h4>
               <p className="text-black/80 mb-8 text-lg relative z-10">Dale un respiro a tu equipo. Permite que la IA gestione las tareas repetitivas y minimice los errores, mientras tu empresa se enfoca en estrategias de alto impacto.</p>
               <Magnetic>
                 <Link to="/servicios/business-automation" className="flex items-center gap-3 text-black font-black group-hover:gap-5 transition-all relative z-10 text-lg">
