@@ -89,8 +89,6 @@ const ParticleSphere = () => {
     };
     window.addEventListener('resize', handleResize);
 
-    let angleX = 0;
-    let angleY = 0;
     let animationFrameId: number;
 
     const draw = () => {
