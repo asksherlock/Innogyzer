@@ -1,5 +1,3 @@
-import React from 'react';
-
 const totalPages = 25;
 // Helper to generate the exact image paths
 const images = Array.from({ length: totalPages }, (_, i) => {
