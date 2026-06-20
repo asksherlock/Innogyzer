@@ -64,14 +64,11 @@ const ParticleSphere = () => {
       const x = Math.cos(theta) * radiusAtY;
       const z = Math.sin(theta) * radiusAtY;
 
-      // Las partículas inician en el centro (0,0,0) con gran velocidad hacia afuera (x, y, z son la dirección)
-      const speed = Math.random() * 40 + 20; // Velocidad aleatoria de explosión
+      // Las partículas inician formando la esfera normal
       particles.push({
         baseX: x, baseY: y, baseZ: z,
-        cx: 0, cy: 0, cz: 0,
-        vx: x * speed, 
-        vy: y * speed, 
-        vz: z * speed
+        cx: x, cy: y, cz: z,
+        vx: 0, vy: 0, vz: 0
       });
     }
 
@@ -80,7 +77,31 @@ const ParticleSphere = () => {
       height = canvas.height = window.innerHeight;
       sphereRadius = Math.min(width, height) * 0.4;
     };
+    let mouse = { x: -1000, y: -1000 };
+    let isExploded = false;
+
+    const handleMouseMove = (e: MouseEvent) => {
+      mouse.x = e.clientX;
+      mouse.y = e.clientY;
+      
+      const dx = mouse.x - width / 2;
+      const dy = mouse.y - height / 2;
+      const dist = Math.sqrt(dx * dx + dy * dy);
+      
+      if (dist < sphereRadius && !isExploded) {
+        isExploded = true;
+        // Trigger explosion
+        particles.forEach(p => {
+           const speed = Math.random() * 40 + 20;
+           p.vx = p.cx * speed;
+           p.vy = p.cy * speed;
+           p.vz = p.cz * speed;
+        });
+      }
+    };
+
     window.addEventListener('resize', handleResize);
+    window.addEventListener('mousemove', handleMouseMove);
 
     let animationFrameId: number;
 
@@ -150,6 +171,7 @@ const ParticleSphere = () => {
 
     return () => {
       window.removeEventListener('resize', handleResize);
+      window.removeEventListener('mousemove', handleMouseMove);
       cancelAnimationFrame(animationFrameId);
     };
   }, []);
@@ -610,7 +632,7 @@ const Services = () => {
                   <div className="absolute top-0 right-0 w-32 h-32 bg-cyan-500/10 rounded-full blur-[40px] -translate-y-1/2 translate-x-1/2 group-hover:bg-primary/20 transition-colors duration-700 pointer-events-none z-0" />
                   
                   {/* Geometric Decoration Watermark */}
-                  <div className="absolute top-1/2 -translate-y-1/2 -right-16 md:-right-8 w-64 h-64 text-white/5 group-hover:text-primary/10 transition-colors duration-700 pointer-events-none z-0 rotate-12 group-hover:rotate-0">
+                  <div className={`absolute ${i === 0 ? '-bottom-12 right-0 md:right-8 w-80 h-80' : 'top-1/2 -translate-y-1/2 -right-16 md:-right-8 w-64 h-64'} text-white/5 group-hover:text-primary/10 transition-colors duration-700 pointer-events-none z-0 rotate-12 group-hover:rotate-0`}>
                     {svc.deco}
                   </div>
                   
