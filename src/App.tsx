@@ -180,12 +180,12 @@ const ParticleSphere = () => {
 };
 
 // --- Animated Background (Intellexia-style breathing glow and drifting stars) ---
-const AnimatedBackground = () => {
+const AnimatedBackground = ({ showParticles = true }: { showParticles?: boolean }) => {
   return (
     <div className="absolute top-0 left-0 w-full h-screen overflow-hidden pointer-events-none z-0 bg-black">
       
       {/* Interactive Sphere */}
-      <ParticleSphere />
+      {showParticles && <ParticleSphere />}
 
       {/* Massive centered yellow glow (Breathing / Pulsing) */}
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-[#dcea22]/15 rounded-full blur-[150px] animate-glow-pulse z-0" />
@@ -466,7 +466,7 @@ const fadeUp = {
 
 const Manifesto = () => {
   return (
-    <section className="py-40 relative z-10 overflow-hidden bg-black/40">
+    <section className="py-16 md:py-24 relative z-10 overflow-hidden bg-black/40">
       <div className="absolute inset-0 bg-gradient-to-b from-transparent via-cyan-900/10 to-transparent pointer-events-none" />
       <div className="container mx-auto px-6 max-w-5xl text-left relative z-10">
         <ScrollRevealText 
@@ -525,7 +525,7 @@ const About = () => {
   ];
 
   return (
-    <section id="quienes-somos" className="py-24 relative z-10 bg-black/40">
+    <section id="quienes-somos" className="py-16 md:py-24 relative z-10 bg-black/40">
       <div className="container mx-auto px-6 max-w-7xl">
         <WordReveal text="¿Quiénes somos?" className="text-4xl md:text-6xl font-bold mb-20 justify-center" />
         
@@ -567,7 +567,7 @@ const Pillars = () => {
   ];
 
   return (
-    <section id="pilares" className="py-24 relative z-10 bg-black/40">
+    <section id="pilares" className="py-16 md:py-24 relative z-10 bg-black/40">
       <div className="container mx-auto px-6 max-w-7xl">
         <WordReveal text="Nuestros Pilares Fundamentales" className="text-4xl md:text-6xl font-bold mb-20 text-center text-gradient-animate" />
         
@@ -596,7 +596,7 @@ const Pillars = () => {
 }
 
 const Services = () => {
-  const services = [
+  const fallbackServices = [
     { slug: 'investigacion-y-insights', title: 'Investigación & Insights', desc: 'Descubrimos lo que realmente impulsa las decisiones de tus clientes para identificar oportunidades de innovación.', deco: <SvgFlower /> },
     { slug: 'designing-strategy', title: 'Designing Strategy', desc: 'Diseñamos estrategias ganadoras para tu organización alineando objetivos, recursos y capacidades.', deco: <SvgVenn /> },
     { slug: 'design-sprints', title: 'Design Sprints', desc: 'Resolvemos grandes desafíos e impulsamos la innovación en solo 5 días probando soluciones reales.', deco: <SvgStarburst /> },
@@ -605,8 +605,27 @@ const Services = () => {
     { slug: 'experimentacion', title: 'Experimentación', desc: 'Validamos tus ideas de negocio de manera ágil y efectiva reduciendo la incertidumbre.', deco: <SvgArrows /> },
   ];
 
+  const [services, setServices] = useState(fallbackServices);
+
+  useEffect(() => {
+    fetch('http://localhost:3000/api/services?limit=10')
+      .then(res => res.json())
+      .then(data => {
+        if (data && data.docs && data.docs.length > 0) {
+          const decos = [<SvgFlower />, <SvgVenn />, <SvgStarburst />, <SvgFaceCursor />, <SvgAsterisk />, <SvgArrows />];
+          setServices(data.docs.map((doc: any, i: number) => ({
+            slug: doc.id || doc.slug || i.toString(),
+            title: doc.title,
+            desc: doc.shortDescription,
+            deco: decos[i % decos.length]
+          })));
+        }
+      })
+      .catch(err => console.error("Error fetching services:", err));
+  }, []);
+
   return (
-    <section id="servicios" className="py-32 relative z-10 bg-black/40">
+    <section id="servicios" className="py-16 md:py-24 relative z-10 bg-black/40">
       <div className="container mx-auto px-6 max-w-7xl">
         <WordReveal text="Servicios de Innovación" className="text-4xl md:text-6xl font-bold mb-20" />
         
@@ -694,7 +713,7 @@ const Services = () => {
 
 const ServicesAI = () => {
   return (
-    <section id="servicios-ia" className="py-32 relative z-10 overflow-hidden bg-black/40">
+    <section id="servicios-ia" className="py-16 md:py-24 relative z-10 overflow-hidden bg-black/40">
       <div className="absolute top-1/2 right-0 w-[800px] h-[800px] bg-glow/10 blur-[150px] rounded-full pointer-events-none" />
       
       <div className="container mx-auto px-6 max-w-7xl">
@@ -777,7 +796,7 @@ const Team = () => {
   ];
 
   return (
-    <section id="equipo" className="py-32 relative z-10 bg-black/40">
+    <section id="equipo" className="py-16 md:py-24 relative z-10 bg-black/40">
       <div className="container mx-auto px-6 max-w-7xl">
         <motion.div variants={fadeUp} initial="hidden" whileInView="visible" viewport={{ once: true }} className="text-center mb-20 max-w-3xl mx-auto">
           <WordReveal text="Equipo" className="text-4xl md:text-6xl font-bold mb-8 justify-center" />
@@ -823,7 +842,7 @@ const Footer = () => {
   const yText = useTransform(scrollYProgress, [0.8, 1], [-100, 0]);
   
   return (
-    <footer id="contacto" className="relative z-10 border-t border-white/10 pt-32 pb-12 overflow-hidden">
+    <footer id="contacto" className="relative z-10 border-t border-white/10 pt-16 md:pt-24 pb-12 overflow-hidden">
       <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-px bg-gradient-to-r from-transparent via-primary to-transparent opacity-50" />
       <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-[1000px] h-[500px] bg-primary/5 blur-[150px] rounded-full pointer-events-none" />
       
@@ -1142,28 +1161,37 @@ const ServicePage = () => {
 };
 
 // --- Main App Wrapper ---
+const AppContent = () => {
+  const location = useLocation();
+  const isBlogPost = location.pathname.startsWith('/blog/') && location.pathname.length > 6;
+
+  return (
+    <div className="min-h-screen bg-[#030305] text-white relative flex flex-col">
+      <AnimatedBackground showParticles={!isBlogPost} />
+      <Navbar />
+      <ContactModal />
+      
+      <div className="flex-grow">
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/servicios/:id" element={<ServicePage />} />
+          <Route path="/aviso-privacidad" element={<PrivacyPolicy />} />
+          <Route path="/blog" element={<Blog />} />
+          <Route path="/blog/:slug" element={<BlogPost />} />
+        </Routes>
+      </div>
+      
+      <Footer />
+    </div>
+  );
+};
+
 function App() {
   useSmoothScroll(); // Initialize Lenis
 
   return (
     <Router>
-      <div className="min-h-screen bg-[#030305] text-white relative flex flex-col">
-        <AnimatedBackground />
-        <Navbar />
-        <ContactModal />
-        
-        <div className="flex-grow">
-          <Routes>
-            <Route path="/" element={<Home />} />
-            <Route path="/servicios/:id" element={<ServicePage />} />
-            <Route path="/aviso-privacidad" element={<PrivacyPolicy />} />
-            <Route path="/blog" element={<Blog />} />
-            <Route path="/blog/:slug" element={<BlogPost />} />
-          </Routes>
-        </div>
-        
-        <Footer />
-      </div>
+      <AppContent />
     </Router>
   );
 }

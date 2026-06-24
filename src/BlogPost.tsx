@@ -4,39 +4,89 @@ import { useParams, Link } from 'react-router-dom';
 import { getPostBySlug } from './services/payload';
 import type { Post } from './services/payload';
 
-// Simple renderer for Payload Lexical RichText
+// Recursive renderer for Payload Lexical RichText
+const renderLexicalNode = (node: any, i: number): React.ReactNode => {
+  if (node.type === 'text') {
+    return (
+      <span 
+        key={i} 
+        className={`
+          ${node.format === 1 ? 'font-bold text-white' : ''} 
+          ${node.format === 2 ? 'italic text-white/90' : ''}
+          ${node.format === 8 ? 'underline' : ''}
+        `}
+      >
+        {node.text}
+      </span>
+    );
+  }
+  if (node.type === 'paragraph') {
+    return (
+      <p key={i} className="mb-6 text-lg text-white/80 leading-relaxed">
+        {node.children?.map((child: any, j: number) => renderLexicalNode(child, j))}
+      </p>
+    );
+  }
+  if (node.type === 'heading') {
+    const Tag = `h${node.tag?.replace('h', '') || '2'}` as any;
+    return (
+      <Tag key={i} className="text-2xl md:text-3xl font-bold text-white mt-12 mb-6">
+        {node.children?.map((c: any, j: number) => renderLexicalNode(c, j))}
+      </Tag>
+    );
+  }
+  if (node.type === 'list') {
+    const Tag = node.tag === 'ol' ? 'ol' : 'ul';
+    return (
+      <Tag key={i} className={`mb-6 pl-6 ${node.tag === 'ol' ? 'list-decimal' : 'list-disc'} text-lg text-white/80 space-y-2`}>
+        {node.children?.map((child: any, j: number) => renderLexicalNode(child, j))}
+      </Tag>
+    );
+  }
+  if (node.type === 'listitem') {
+    return (
+      <li key={i}>
+        {node.children?.map((child: any, j: number) => renderLexicalNode(child, j))}
+      </li>
+    );
+  }
+  if (node.type === 'upload') {
+    return (
+      <div key={i} className="my-10 w-full rounded-2xl overflow-hidden bg-white/5 border border-white/10">
+        <img 
+          src={`http://localhost:3000${node.value?.url}`} 
+          alt={node.value?.alt || 'Blog Image'}
+          className="w-full h-auto object-cover"
+        />
+      </div>
+    );
+  }
+  if (node.type === 'quote') {
+    return (
+       <blockquote key={i} className="border-l-4 border-[#dcea22] pl-6 my-8 text-xl italic text-white/90">
+         {node.children?.map((child: any, j: number) => renderLexicalNode(child, j))}
+       </blockquote>
+    );
+  }
+  if (node.type === 'link') {
+    return (
+      <a key={i} href={node.fields?.url} className="text-[#dcea22] hover:underline" target={node.fields?.newTab ? "_blank" : "_self"}>
+         {node.children?.map((child: any, j: number) => renderLexicalNode(child, j))}
+      </a>
+    );
+  }
+  
+  // Fallback for unknown nodes that have children
+  if (node.children) {
+    return <React.Fragment key={i}>{node.children.map((child: any, j: number) => renderLexicalNode(child, j))}</React.Fragment>;
+  }
+
+  return null;
+}
+
 const renderLexical = (content: any) => {
   if (!content || !content.root || !content.root.children) return null;
-  
-  return content.root.children.map((node: any, i: number) => {
-    if (node.type === 'paragraph') {
-      return (
-        <p key={i} className="mb-6 text-lg text-white/80 leading-relaxed">
-          {node.children?.map((child: any, j: number) => (
-            <span 
-              key={j} 
-              className={`
-                ${child.format === 1 ? 'font-bold text-white' : ''} 
-                ${child.format === 2 ? 'italic' : ''}
-              `}
-            >
-              {child.text}
-            </span>
-          ))}
-        </p>
-      );
-    }
-    if (node.type === 'heading') {
-      const Tag = `h${node.tag.replace('h', '')}` as any;
-      return (
-        <Tag key={i} className="text-2xl md:text-3xl font-bold text-white mt-12 mb-6">
-          {node.children?.map((c: any) => c.text).join('')}
-        </Tag>
-      );
-    }
-    // Very basic fallback
-    return <div key={i}>{JSON.stringify(node)}</div>;
-  });
+  return content.root.children.map((node: any, i: number) => renderLexicalNode(node, i));
 };
 
 const BlogPost = () => {
