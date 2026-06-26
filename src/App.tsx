@@ -10,6 +10,15 @@ import BlogPost from './BlogPost';
 import ImagePresentationViewer from './components/ImagePresentationViewer';
 import Lenis from 'lenis';
 
+// --- Types ---
+export interface Testimonial {
+  id: string;
+  clientName: string;
+  companyRole: string;
+  quote: string;
+  photo?: { url: string };
+}
+
 // --- Smooth Scroll Init ---
 const useSmoothScroll = () => {
   useEffect(() => {
@@ -188,8 +197,8 @@ const AnimatedBackground = ({ showParticles = true }: { showParticles?: boolean 
       {showParticles && <ParticleSphere />}
 
       {/* Massive centered yellow glow (Breathing / Pulsing) */}
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-[#dcea22]/15 rounded-full blur-[150px] animate-glow-pulse z-0" />
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[400px] h-[400px] bg-[#eab308]/10 rounded-full blur-[100px] animate-glow-pulse z-0" style={{ animationDelay: '2s' }} />
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-[#dcea22]/15 rounded-full blur-[150px] animate-glow-pulse z-0 will-change-transform" />
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[400px] h-[400px] bg-[#eab308]/10 rounded-full blur-[100px] animate-glow-pulse z-0 will-change-transform" style={{ animationDelay: '2s' }} />
       
       {/* Drifting Star particles */}
       <motion.div 
@@ -597,32 +606,14 @@ const Pillars = () => {
 
 const Services = () => {
   const fallbackServices = [
-    { slug: 'investigacion-y-insights', title: 'Investigación & Insights', desc: 'Descubrimos lo que realmente impulsa las decisiones de tus clientes para identificar oportunidades de innovación.', deco: <SvgFlower /> },
-    { slug: 'designing-strategy', title: 'Designing Strategy', desc: 'Diseñamos estrategias ganadoras para tu organización alineando objetivos, recursos y capacidades.', deco: <SvgVenn /> },
-    { slug: 'design-sprints', title: 'Design Sprints', desc: 'Resolvemos grandes desafíos e impulsamos la innovación en solo 5 días probando soluciones reales.', deco: <SvgStarburst /> },
-    { slug: 'coolture-sprint', title: 'Coolture Sprint', desc: 'Transformamos tu organización para que la innovación sea parte del ADN de tu equipo.', deco: <SvgFaceCursor /> },
+    { slug: 'investigacion-y-insights', title: 'Investigación & Insights', desc: 'Descubrimos lo que realmente impulsa las decisiones de tus clientes para identificar oportunidades.', deco: <SvgRings /> },
+    { slug: 'designing-strategy', title: 'Designing Strategy', desc: 'Alineamos objetivos, recursos y capacidades para asegurar un crecimiento a largo plazo.', deco: <SvgArrows /> },
+    { slug: 'design-sprints', title: 'Design Sprints', desc: 'Resolvemos grandes desafíos e impulsamos la innovación probando soluciones reales en 5 días.', deco: <SvgFaceCursor /> },
     { slug: 'business-design', title: 'Business Design', desc: 'Diseñamos modelos de negocio y propuestas de valor innovadoras y sostenibles que generan valor.', deco: <SvgAsterisk /> },
-    { slug: 'experimentacion', title: 'Experimentación', desc: 'Validamos tus ideas de negocio de manera ágil y efectiva reduciendo la incertidumbre.', deco: <SvgArrows /> },
+    { slug: 'experimentacion', title: 'Experimentación', desc: 'Validamos tus ideas de negocio de manera ágil y efectiva reduciendo la incertidumbre mediante pilotos.', deco: <SvgFlower /> },
   ];
 
-  const [services, setServices] = useState(fallbackServices);
-
-  useEffect(() => {
-    fetch('http://localhost:3000/api/services?limit=10')
-      .then(res => res.json())
-      .then(data => {
-        if (data && data.docs && data.docs.length > 0) {
-          const decos = [<SvgFlower />, <SvgVenn />, <SvgStarburst />, <SvgFaceCursor />, <SvgAsterisk />, <SvgArrows />];
-          setServices(data.docs.map((doc: any, i: number) => ({
-            slug: doc.id || doc.slug || i.toString(),
-            title: doc.title,
-            desc: doc.shortDescription,
-            deco: decos[i % decos.length]
-          })));
-        }
-      })
-      .catch(err => console.error("Error fetching services:", err));
-  }, []);
+  const services = fallbackServices;
 
   return (
     <section id="servicios" className="py-16 md:py-24 relative z-10 bg-black/40">
@@ -713,7 +704,7 @@ const Services = () => {
 
 const ServicesAI = () => {
   return (
-    <section id="servicios-ia" className="py-16 md:py-24 relative z-10 overflow-hidden bg-black/40">
+    <section id="servicios-ia" className="py-16 md:py-24 relative z-10 bg-black/40">
       <div className="absolute top-1/2 right-0 w-[800px] h-[800px] bg-glow/10 blur-[150px] rounded-full pointer-events-none" />
       
       <div className="container mx-auto px-6 max-w-7xl">
@@ -837,6 +828,82 @@ const Team = () => {
   );
 }
 
+const Testimonials = () => {
+  const [testimonials, setTestimonials] = useState<Testimonial[]>([]);
+  const [loading, setLoading] = useState(true);
+  
+  useEffect(() => {
+    fetch('http://localhost:3000/api/testimonials?depth=1')
+      .then(res => res.json())
+      .then(data => {
+        if (data && data.docs && data.docs.length > 0) {
+          setTestimonials(data.docs);
+        } else {
+          // Fallback dummy data si no hay testimonios en el CMS
+          setTestimonials([
+            { id: '1', clientName: 'María González', companyRole: 'Directora de Innovación, TechCorp', quote: 'Innogyzer transformó por completo nuestra cultura organizacional. Gracias a su sprint de innovación, reducimos nuestros tiempos de entrega en un 40%.' },
+            { id: '2', clientName: 'Carlos Ruiz', companyRole: 'CEO, StartupXYZ', quote: 'La implementación de IA que diseñaron para nosotros nos ahorró cientos de horas manuales al mes. Su equipo entiende perfectamente el cruce entre negocio y tecnología.' }
+          ]);
+        }
+        setLoading(false);
+      })
+      .catch(err => {
+        console.error('Error fetching testimonials:', err);
+        // Fallback dummy data en caso de error
+        setTestimonials([
+          { id: '1', clientName: 'María González', companyRole: 'Directora de Innovación, TechCorp', quote: 'Innogyzer transformó por completo nuestra cultura organizacional. Gracias a su sprint de innovación, reducimos nuestros tiempos de entrega en un 40%.' }
+        ]);
+        setLoading(false);
+      });
+  }, []);
+
+  if (loading) return null;
+
+  return (
+    <section className="py-16 md:py-24 relative z-10 bg-black/40">
+      <div className="container mx-auto px-6 max-w-7xl">
+        <motion.div variants={fadeUp} initial="hidden" whileInView="visible" viewport={{ once: true }} className="text-center mb-16 max-w-3xl mx-auto">
+          <WordReveal text="Testimonios" className="text-4xl md:text-6xl font-bold mb-8 justify-center" />
+          <p className="text-white/60 text-xl">Lo que dicen los líderes sobre nuestro impacto.</p>
+        </motion.div>
+        
+        <div className="flex overflow-x-auto snap-x snap-mandatory gap-6 pb-8 scrollbar-hide">
+          {testimonials.map((test, i) => (
+            <motion.div 
+              key={test.id || i}
+              variants={fadeUp} 
+              initial="hidden" 
+              whileInView="visible" 
+              viewport={{ once: true }}
+              className="glass-panel p-8 md:p-10 rounded-[30px] flex-shrink-0 w-[85vw] md:w-[600px] snap-center flex flex-col justify-between border border-white/5"
+            >
+              <div className="mb-8 relative">
+                <span className="text-[#dcea22] text-6xl absolute -top-4 -left-2 opacity-30 font-serif">"</span>
+                <p className="text-white/80 text-lg md:text-xl relative z-10 italic pl-6 leading-relaxed">{test.quote}</p>
+              </div>
+              <div className="flex items-center gap-4 border-t border-white/10 pt-6">
+                {test.photo?.url ? (
+                  <div className="w-14 h-14 rounded-full overflow-hidden border-2 border-[#dcea22]/50 shrink-0">
+                    <img src={test.photo.url.startsWith('http') ? test.photo.url : `http://localhost:3000${test.photo.url}`} alt={test.clientName} className="w-full h-full object-cover" />
+                  </div>
+                ) : (
+                  <div className="w-14 h-14 rounded-full bg-white/10 border-2 border-[#dcea22]/50 shrink-0 flex items-center justify-center">
+                    <span className="text-white font-bold">{test.clientName.charAt(0)}</span>
+                  </div>
+                )}
+                <div>
+                  <h4 className="text-white font-bold text-lg">{test.clientName}</h4>
+                  <p className="text-[#dcea22] text-sm font-medium">{test.companyRole}</p>
+                </div>
+              </div>
+            </motion.div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+};
+
 const Footer = () => {
   const { scrollYProgress } = useScroll();
   const yText = useTransform(scrollYProgress, [0.8, 1], [-100, 0]);
@@ -935,7 +1002,7 @@ const ClientsMarquee = () => {
   ];
 
   return (
-    <section className="py-16 bg-[#050505] relative z-20 flex flex-col items-center overflow-hidden">
+    <section className="py-16 bg-[#050505] relative z-10 flex flex-col items-center">
       <p className="text-white/40 text-xs md:text-sm font-medium tracking-[0.2em] uppercase mb-12 text-center px-4">
         Organizaciones que confían en nosotros
       </p>
@@ -946,7 +1013,7 @@ const ClientsMarquee = () => {
         <div className="absolute inset-y-0 right-0 w-24 md:w-40 bg-gradient-to-l from-[#050505] to-transparent z-10 pointer-events-none" />
         
         <motion.div 
-          className="flex whitespace-nowrap gap-20 md:gap-32 items-center pl-20 md:pl-32"
+          className="flex whitespace-nowrap gap-20 md:gap-32 items-center pl-20 md:pl-32 will-change-transform"
           animate={{ x: ["0%", "-50%"] }}
           transition={{ ease: "linear", duration: 30, repeat: Infinity }}
         >
@@ -1085,8 +1152,10 @@ const Home = () => {
         <Pillars />
         <Services />
         <ServicesAI />
+        <PartnersMarquee />
         <ClientsMarquee />
         <Team />
+        <Testimonials />
       </div>
     </>
   );
@@ -1183,6 +1252,51 @@ const AppContent = () => {
       
       <Footer />
     </div>
+  );
+};
+
+const PartnersMarquee = () => {
+  return (
+    <section className="py-16 relative z-10 bg-black/40">
+      <div className="container mx-auto px-6 relative z-20">
+        <div className="glass-panel rounded-[2.5rem] border border-white/10 py-6 md:py-8 relative overflow-hidden bg-black/40 backdrop-blur-xl shadow-2xl">
+          <h3 className="text-center text-[#dcea22] text-xs font-bold tracking-[0.3em] uppercase mb-2">Partners</h3>
+          <p className="text-center text-[#dcea22] text-xs font-bold tracking-[0.3em] uppercase mb-6 md:mb-8">Estas empresas nos respaldan:</p>
+
+          {/* Infinite Marquee */}
+          <div className="overflow-hidden w-full">
+            <div className="flex animate-marquee whitespace-nowrap opacity-80 hover:opacity-100 transition-opacity duration-700 will-change-transform">
+              {[...Array(8)].map((_, i) => (
+                <div key={i} className="inline-flex items-center justify-center mx-16 gap-32">
+                  
+                  {/* Google for Startups Logo */}
+                  <div className="flex-shrink-0 flex items-center justify-center w-[200px] md:w-[300px] h-[100px] md:h-[120px]">
+                    <img 
+                      src="/assets/Logo_for_Google_for_Startups_page.png" 
+                      alt="Google for Startups" 
+                      className="w-full h-full object-contain scale-110 md:scale-125 hover:scale-125 md:hover:scale-150 transition-all duration-300 brightness-0 invert opacity-80 hover:opacity-100"
+                    />
+                  </div>
+
+                  <div className="w-1.5 h-1.5 rounded-full bg-[#dcea22]/30"></div>
+
+                  {/* Claude Partner Network Logo */}
+                  <div className="flex-shrink-0 flex items-center justify-center w-[200px] md:w-[300px] h-[100px] md:h-[120px]">
+                    <img 
+                      src="/assets/partenr.svg" 
+                      alt="Claude Partner Network" 
+                      className="w-full h-full object-contain scale-110 md:scale-125 hover:scale-125 md:hover:scale-150 transition-all duration-300 brightness-0 invert opacity-80 hover:opacity-100"
+                    />
+                  </div>
+
+                  <div className="w-1.5 h-1.5 rounded-full bg-[#dcea22]/30"></div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
   );
 };
 
