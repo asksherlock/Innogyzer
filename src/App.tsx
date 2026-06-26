@@ -3,7 +3,7 @@ import { BrowserRouter as Router, Routes, Route, Link, useParams, useLocation } 
 import { motion, useScroll, useTransform, AnimatePresence, useMotionValue, useMotionTemplate } from 'framer-motion';
 import { ArrowRightIcon, ChatBubbleBottomCenterTextIcon, CheckCircleIcon } from '@heroicons/react/24/outline';
 import { SiPython, SiNotion, SiOpenai, SiZapier, SiAirtable, SiMake, SiGooglegemini, SiAnthropic, SiHuggingface, SiTensorflow } from 'react-icons/si';
-import { SvgRings, SvgArrows, SvgFaceCursor, SvgAsterisk, SvgVenn, SvgFlower, SvgStarburst } from './Decorations';
+import { SvgRings, SvgArrows, SvgFaceCursor, SvgAsterisk, SvgFlower } from './Decorations';
 import PrivacyPolicy from './PrivacyPolicy';
 import Blog from './Blog';
 import BlogPost from './BlogPost';
