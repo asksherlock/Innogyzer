@@ -54,7 +54,7 @@ const renderLexicalNode = (node: any, i: number): React.ReactNode => {
     return (
       <div key={i} className="my-10 w-full rounded-2xl overflow-hidden bg-white/5 border border-white/10">
         <img 
-          src={`http://localhost:3000${node.value?.url}`} 
+          src={`https://innogyzer-lms.vercel.app${node.value?.url}`} 
           alt={node.value?.alt || 'Blog Image'}
           className="w-full h-auto object-cover"
         />
@@ -140,7 +140,7 @@ const BlogPost = () => {
           {post.heroImage && (
             <div className="w-full h-[400px] md:h-[500px] rounded-[32px] overflow-hidden bg-white/5 border border-white/10">
               <img 
-                src={`http://localhost:3000${post.heroImage.url}`} 
+                src={`https://innogyzer-lms.vercel.app${post.heroImage.url}`} 
                 alt={post.heroImage.alt || post.title}
                 className="w-full h-full object-cover"
               />

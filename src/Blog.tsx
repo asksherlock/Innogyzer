@@ -59,7 +59,7 @@ const Blog = () => {
                     <div className="w-full h-48 bg-white/5 rounded-2xl mb-6 overflow-hidden relative">
                       {post.heroImage ? (
                         <img 
-                          src={`http://localhost:3000${post.heroImage.url}`} 
+                          src={`https://innogyzer-lms.vercel.app${post.heroImage.url}`} 
                           alt={post.heroImage.alt || post.title}
                           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                         />

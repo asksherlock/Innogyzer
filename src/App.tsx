@@ -833,7 +833,7 @@ const Testimonials = () => {
   const [loading, setLoading] = useState(true);
   
   useEffect(() => {
-    fetch('http://localhost:3000/api/testimonials?depth=1')
+    fetch('https://innogyzer-lms.vercel.app/api/testimonials?depth=1')
       .then(res => res.json())
       .then(data => {
         if (data && data.docs && data.docs.length > 0) {
@@ -884,7 +884,7 @@ const Testimonials = () => {
               <div className="flex items-center gap-4 border-t border-white/10 pt-6">
                 {test.photo?.url ? (
                   <div className="w-14 h-14 rounded-full overflow-hidden border-2 border-[#dcea22]/50 shrink-0">
-                    <img src={test.photo.url.startsWith('http') ? test.photo.url : `http://localhost:3000${test.photo.url}`} alt={test.clientName} className="w-full h-full object-cover" />
+                    <img src={test.photo.url.startsWith('http') ? test.photo.url : `https://innogyzer-lms.vercel.app${test.photo.url}`} alt={test.clientName} className="w-full h-full object-cover" />
                   </div>
                 ) : (
                   <div className="w-14 h-14 rounded-full bg-white/10 border-2 border-[#dcea22]/50 shrink-0 flex items-center justify-center">
