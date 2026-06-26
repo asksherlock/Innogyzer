@@ -98,5 +98,5 @@ El frontend de Innogyzer sigue un conjunto estricto de reglas de diseño para ma
 ---
 
 <div align="center">
-  <p>Construido con ❤️ por el equipo de Innogyzer.</p>
+
 </div>
